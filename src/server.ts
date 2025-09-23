@@ -9,7 +9,7 @@ let server: Server;
 
 const startServer = async() =>{
  try {
-    await  mongoose.connect(envVars.MONGODB_URL);
+    await  mongoose.connect(envVars.DB_URL);
 
 
     server = app.listen(envVars.PORT, () => {
