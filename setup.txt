@@ -1,0 +1,18 @@
+## Project Setup
+#### set npm
+git init
+git checkout -b development
+git add .
+git commit -m"git initialized"
+git checkout -b project-setup
+
+npm init -y </br>
+npm i -D typescript
+tsc --init <<or>> npx tsc --init
+npm i express mongoose zod jsonwebtoken cors bcrypt dotenv
+npm i -D ts-node-dev @types/express @types/cors @types/dotenv @types/jsonwebtoken
+
+// set Typescript ES lint  >> go to website
+npm install --save-dev eslint @eslint/js typescript typescript-eslint
+>>> check the error:
+npx eslint .
