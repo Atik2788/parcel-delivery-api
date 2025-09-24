@@ -1,0 +1,39 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable no-unused-vars */
+import { NextFunction, Request, Response } from "express";
+import { catchAsync } from "../../utils/catchAsync";
+import { sendResponse } from "../../utils/sendResponse";
+import { UserService } from "./user.service";
+
+
+const createUser = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    // Business logic for creating a user goes here
+    console.log(req.body)
+    const user = await UserService.createUser(req.body);
+
+    sendResponse(res, {
+        statusCode: 201,
+        success: true,
+        message: "User created successfully",
+        data: user  
+    })
+})
+
+const getAllUsers = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    // Business logic for getting all users goes here
+    const users = await UserService.getAllUsers();
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "Users fetched successfully",
+        data: users  
+    })
+})
+
+
+export const UserController = {
+    createUser,
+    getAllUsers
+}
+
+
