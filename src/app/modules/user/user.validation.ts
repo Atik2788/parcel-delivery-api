@@ -35,6 +35,9 @@ export const createZodSchema = z.object({
                     .max(200, { message: "Address must be at most 200 characters long" })
                     .optional()
                     ,
+
+                
+                role: z.enum([Role.SENDER, Role.RECEIVER]).optional() // <-- এখানে যোগ করুন
    })
 
 

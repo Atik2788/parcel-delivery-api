@@ -1,11 +1,15 @@
 import { User } from "./user.model";
-import { IAuthProvider, IUser } from "./user.interface";
+import { IAuthProvider, IUser, Role } from "./user.interface";
 import bcryptjs from 'bcryptjs';
 import { envVars } from "../../config/env";
+import { JwtPayload } from "jsonwebtoken";
+import AppError from "../../errorHelpers/appError";
+import httpStatus from "http-status";
 
 
 const createUser = async(payload: Partial<IUser>) =>{
-    const {email, password, ...rest} = payload;
+    const {email, password,role, ...rest} = payload;
+    console.log("role", role)
 
     // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
     const isUserExist = await User.findOne({email});
@@ -20,8 +24,11 @@ const createUser = async(payload: Partial<IUser>) =>{
     const user = await User.create({
         email,
         password: hashPassword,
+        ...rest,
         auths: [authProvider],
-        ...rest
+        role: payload.role && Object.values(Role).includes(payload.role as Role)
+          ? (payload.role as Role)
+          : Role.SENDER
     });
 
     return {user};
@@ -38,7 +45,49 @@ const getAllUsers = async() => {
     };
 }
 
+const updateUser = async(userId: string, payload: Partial<IUser>, verifiedToken: JwtPayload) => {
+    console.log(verifiedToken)
+    const ifUserExist = await User.findById(userId);
+
+    if(!ifUserExist){
+        throw new AppError(httpStatus.NOT_FOUND, "User does not exist")
+    }   
+
+    if(verifiedToken.role === Role.RECEIVER || verifiedToken.role === Role.SENDER){
+        if(verifiedToken.userId !== userId){
+            throw new AppError(httpStatus.FORBIDDEN, "You are not allowed to update other user profile")
+        }
+    }
+
+    if(payload.role){
+        if(verifiedToken.role === Role.SENDER || verifiedToken.role === Role.RECEIVER){
+            throw new AppError(httpStatus.FORBIDDEN, "You are not allowed to update role")
+        }
+
+        if(payload.role === Role.SUPER_ADMIN && verifiedToken.role === Role.ADMIN){
+            throw new AppError(httpStatus.FORBIDDEN, "You are not allowed to update role to Super_Admin")
+        }
+    }
+ 
+
+    if(payload.isActive || payload.isDeleted || payload.isValidated){
+            if(verifiedToken.role === Role.SENDER || verifiedToken.role === Role.RECEIVER){
+                throw new AppError(httpStatus.FORBIDDEN, "You are not allowed to update role")
+            }
+    }
+
+    if(payload.password){
+        payload.password = await bcryptjs.hash(payload.password, envVars.BCRYPT_SALT_ROUNDS as string)
+    }
+
+    const newUpdateUser = await User.findByIdAndUpdate(userId, payload, {new: true, runValidators: true})
+
+    return {newUpdateUser}
+
+}
+
 export const UserService = {
     createUser,
-    getAllUsers
+    getAllUsers,
+    updateUser
 }
