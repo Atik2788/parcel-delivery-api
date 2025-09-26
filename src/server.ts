@@ -2,7 +2,8 @@
 import {Server} from "http";
 import mongoose from "mongoose";
 import app from "./app";
-import { envVars } from './config/env';
+import { envVars } from './app/config/env';
+import { seedSuperAdmin } from "./app/utils/seedSuperAdmin";
 
 let server: Server;
 
@@ -10,10 +11,10 @@ let server: Server;
 const startServer = async() =>{
  try {
     await  mongoose.connect(envVars.DB_URL);
-
+    console.log("Database connected successfully");
 
     server = app.listen(envVars.PORT, () => {
-        console.log(`Server is running on port ${envVars.PORT}`)
+        console.log(`Server is running on port ${envVars.PORT} in ${envVars.NODE_ENV} mode`);
     })
  } catch (error) {
     console.error("Error connecting to the database:", error)   
@@ -23,7 +24,7 @@ const startServer = async() =>{
 
 (async()=>{
     await startServer();
-    // await seedSuperAdmin()
+    await seedSuperAdmin()
 })();
 
 
