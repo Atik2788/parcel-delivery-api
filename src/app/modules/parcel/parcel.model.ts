@@ -36,15 +36,20 @@ const parcelSchema = new Schema<IParcel>(
     sender: {
       userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
       name: String,
-      phone: String,
-      address: addressSchema,
+      deliveryPhone: { type: String, required: true },
+      pickupPhone: { type: String, required: true },
+      pickupAddress: addressSchema,
+      deliveryAddress: addressSchema,
     },
 
     receiver: {
       userId: { type: Schema.Types.ObjectId, ref: "User" },
       name: String,
-      phone: String,
-      address: String
+      receiverPhone: { type: String },
+      pickupPhone: { type: String },
+      deliveryPhone: { type: String },
+      pickupAddress: addressSchema,
+      deliveryAddress: addressSchema,
     },
 
     deliveryDate: Date,
