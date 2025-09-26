@@ -11,7 +11,7 @@ const authProviderSchema = new Schema<IAuthProvider>({
 })
 
 const userSchema = new Schema<IUser>({
-        name: {type: String, required: true},
+    name: {type: String, required: true},
     age: Number,
     email: {type: String, required: true, unique: true},
     password: {type: String},
@@ -31,9 +31,15 @@ const userSchema = new Schema<IUser>({
     },
     isValidated: {type: Boolean, default: false},
     auths: [authProviderSchema],
-    // bookings: {
-    //     type:
-    // }
+    
+
+
+    // Parcel system fields
+    parcelsSent: [{ type: Schema.Types.ObjectId, ref: "Parcel" }], // as Sender
+    deliveries: [{ type: Schema.Types.ObjectId, ref: "Parcel" }],  // as Receiver
+    averageRating: { type: Number, default: 0 },
+    totalRatings: { type: Number, default: 0 }
+
 
 }, {
     timestamps: true,

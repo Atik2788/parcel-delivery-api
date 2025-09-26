@@ -35,6 +35,10 @@ export interface IUser {
     isValidated ?: boolean;
     role : Role;
     auths : IAuthProvider[];
-    bookings ?: Types.ObjectId[];
-    guides ?: Types.ObjectId[]; 
+
+    // Parcel system related
+    parcelsSent?: Types.ObjectId[];    // Sender হিসেবে পাঠানো parcels
+    deliveries?: Types.ObjectId[];     // Receiver হিসেবে received parcels
+    averageRating?: number;            // Cached average rating
+    totalRatings?: number;             // Rating count
 }
