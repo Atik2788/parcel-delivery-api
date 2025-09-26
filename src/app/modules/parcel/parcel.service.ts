@@ -214,9 +214,14 @@ const updateTrackingSender = async (sender: any, payload: IUpdateTrackingPayload
     }
 
     if(currentStatus === ParcelStatus.CANCELLED || currentStatus === ParcelStatus.RETURNED){
+        if(parcel.currentStatus === currentStatus){
+            throw new AppError(400, `Parcel already in ${currentStatus} status`);
+        }
+
         if(parcel.currentStatus === ParcelStatus.DELIVERED && currentStatus === ParcelStatus.CANCELLED){
             throw new AppError(400, "Delivered parcel cannot be cancelled");
         }
+        
         if(parcel.currentStatus !== ParcelStatus.DELIVERED && currentStatus === ParcelStatus.RETURNED){
             throw new AppError(400, "Only delivered parcel can be returned");
         }
