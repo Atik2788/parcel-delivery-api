@@ -45,15 +45,20 @@ export interface IParcel {
   sender: {
     userId: Types.ObjectId;
     name: string;
-    phone: string;
-    address: IAddress;
+    deliveryPhone: string;
+    pickupPhone: string;
+    pickupAddress: IAddress;
+    deliveryAddress: IAddress;
   };
 
   receiver?: {                        // Receiver info (claim করার সময় fill হবে)
     userId?: Types.ObjectId;
     name: string;
-    phone: string;
-    address: string;
+    receiverPhone: string;
+    pickupPhone?: string;
+    deliveryPhone?: string;
+    pickupAddress?: IAddress;
+    deliveryAddress?: IAddress;
   };
 
   deliveryDate?: Date;
