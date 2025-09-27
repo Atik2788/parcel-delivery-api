@@ -4,12 +4,18 @@ interface TMeta {
     total: number;
 }
 
+interface TMetaParcel{
+    totalParcels: number,
+    totalDeliveries: number,
+    totalUnclaimed: number,
+}
+
 interface tResponse <T>{
     statusCode: number;
     success: boolean; 
     message: string;
     data: T;
-    meta?: TMeta;
+    meta?: TMeta | TMetaParcel;
 }
 
 export const sendResponse = <T>(res: Response, data: tResponse<T>) => {

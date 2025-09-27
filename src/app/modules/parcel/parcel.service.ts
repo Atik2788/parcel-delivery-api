@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { IAddress, ParcelStatus } from "./parcel.interface";
+import { AuthUser, IAddress, ParcelStatus } from "./parcel.interface";
 import { Parcel } from "./parcel.model";
 import AppError from "../../errorHelpers/appError";
 import { User } from "../user/user.model";
@@ -35,7 +35,7 @@ const validTransitions: Record<ParcelStatus, ParcelStatus[]> = {
 
 
 
-const createParcel =  async(senderJwt: any, payload: IParcelCreatePayload) => {
+const createParcel =  async(senderJwt: AuthUser, payload: IParcelCreatePayload) => {
     const senderId = senderJwt.userId;
 
     const sender = await User.findById(senderId);
@@ -99,7 +99,7 @@ const createParcel =  async(senderJwt: any, payload: IParcelCreatePayload) => {
 }
 
 
-const claimParcel = async(parcelId: string, receiver: any, payload: any) => {
+const claimParcel = async(parcelId: string, receiver: AuthUser, payload: any) => {
     const parcel = await Parcel.findById(parcelId);
     // console.log(payload)
 
@@ -145,10 +145,9 @@ const claimParcel = async(parcelId: string, receiver: any, payload: any) => {
 }
 
 
-const updateTrackingReceiver = async (receiver: any, payload: any) =>{
+const updateTrackingReceiver = async (receiver: AuthUser, payload: any) =>{
     const { trackingId, currentStatus, location, note } = payload;
     const parcel = await Parcel.findOne({trackingId: trackingId});
-
 
     if(!trackingId || !currentStatus){
     throw new AppError(400, "Tracking ID, currentStatus, and location are required to update tracking");
@@ -158,7 +157,7 @@ const updateTrackingReceiver = async (receiver: any, payload: any) =>{
         throw new AppError(404, "Parcel not found");
     }
 
-    if(!parcel.receiver || parcel.receiver.userId?.toString() !== receiver.userId){
+    if (parcel?.receiver?.userId?.toString() !== receiver.userId.toString()) {
         throw new AppError(403, "You are not authorized to update tracking for this parcel");
     }
 
@@ -190,17 +189,6 @@ const updateTrackingReceiver = async (receiver: any, payload: any) =>{
     }
 
 
-    // if(parcel.currentStatus === ParcelStatus.DELIVERED){
-    //     throw new AppError(400, `Cannot update tracking for a ${parcel.currentStatus} parcel`);
-    // }
-
-    // if(parcel.currentStatus === ParcelStatus.DISPATCHED && payload.currentStatus !== ParcelStatus.IN_TRANSIT){
-    //     throw new AppError(400, "Now the Parcel Current Status is DISPATCHED, Parcel must be in IN_TRANSIT status to update tracking");
-    // }
-    // if(parcel.currentStatus === ParcelStatus.IN_TRANSIT && payload.currentStatus !== ParcelStatus.DELIVERED){
-    //     throw new AppError(400, "Now the Parcel Current Status is IN_TRANSIT, Parcel must be in DELIVERED status to update tracking");
-    // }
-
     parcel.trackingEvents?.push({
         status: currentStatus,
         location: location,
@@ -215,14 +203,18 @@ const updateTrackingReceiver = async (receiver: any, payload: any) =>{
     return parcel;
 }
 
-const updateTrackingSender = async (sender: any, payload: IUpdateTrackingPayload) =>{
-    const { trackingId, currentStatus } = payload;  
+const updateTrackingSender = async (sender: AuthUser, payload: IUpdateTrackingPayload) =>{
+    const { trackingId, currentStatus } = payload; 
+    const senderId = sender.userId 
 
     const parcel = await Parcel.findOne({trackingId: trackingId});
+    const parcelSenderId = parcel?.sender.userId;
+
     if(!parcel){
         throw new AppError(404, "Parcel not found");
     }    
-    if(!parcel.sender || parcel.sender.userId?.toString() !== sender.userId){
+
+    if (!parcel.sender || parcelSenderId?.toString() !== senderId.toString()) {
         throw new AppError(403, "You are not authorized to update tracking for this parcel");
     }
 
@@ -260,7 +252,7 @@ const updateTrackingSender = async (sender: any, payload: IUpdateTrackingPayload
 
 }
 
-const giveRating = async (trackingId: string, user : any, rating: number, feedback: string) =>{
+const giveRating = async (trackingId: string, user : AuthUser, rating: number, feedback: string) =>{
     // console.log(user.role)
   const parcel = await Parcel.findOne({ trackingId });
   if (!parcel) {
@@ -274,7 +266,7 @@ const giveRating = async (trackingId: string, user : any, rating: number, feedba
   // role based save
   if (user.role === "SENDER") {
 
-    if (parcel.sender.userId.toString() !== user.userId) {
+    if (parcel.sender.userId.toString() !== user.userId.toString()) {
       throw new AppError(403, "You are not authorized to rate this parcel");
     }
 
@@ -288,7 +280,7 @@ const giveRating = async (trackingId: string, user : any, rating: number, feedba
     if(!parcel.receiver?.userId){
         throw new AppError(400, "Receiver information is missing for this parcel");
     }
-    if (parcel.receiver.userId.toString() !== user.userId) {
+    if (parcel.receiver.userId !== user.userId) {
       throw new AppError(403, "You are not authorized to rate this parcel");
     }
     if (!parcel.ratings) {
@@ -304,12 +296,48 @@ const giveRating = async (trackingId: string, user : any, rating: number, feedba
   return parcel;
 }
 
+const getMyParcels = async(sender: AuthUser ) => {
+    if(!sender.userId){
+        throw new AppError(400, "Sender ID missing");
+    }
 
+    const filter = {"sender.userId": sender.userId}
+    const parcels = await Parcel.find(filter)
+        .populate("receiver.userId", "name email") // চাইলে receiver এর info আনতে পারো
+      .populate("sender.userId", "name email")   // sender এর info confirm করার জন্য
+      .sort({ createdAt: -1 });
+      
+    const totalCount = await Parcel.countDocuments(filter);
+
+    const deliveredCount = await Parcel.countDocuments({"receiver.userId": {$exists: true}});    
+    const unclaimed = await Parcel.countDocuments({"receiver.userId": {$exists: false}});
+
+      return {
+        parcels, totalCount, deliveredCount, unclaimed
+      };
+}
+
+const getIncomingParcels = async() => {
+    const filter = {"receiver.userId": {$exists: false}}
+    const parcels = await Parcel.find(filter)
+                     .populate("sender.userId", "name email") // sender info useful হতে পারে
+                    .sort({ createdAt: -1 });
+
+    const totalCount = await Parcel.countDocuments(filter);
+
+    return {
+        parcels, totalCount
+    };
+
+}
 
 export const ParcelService = {
     createParcel,
     claimParcel,
     updateTrackingReceiver,
     updateTrackingSender,
-    giveRating
+    giveRating,
+    getMyParcels,
+    getIncomingParcels
 }
+

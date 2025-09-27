@@ -34,6 +34,11 @@ export interface IAddress {
   extra?: string;        // Optional, e.g., road number, landmark
 }
 
+export interface AuthUser {
+  userId: Types.ObjectId;
+  role: string;
+  email: string
+}
 
 export interface IParcel {
   _id?: Types.ObjectId;

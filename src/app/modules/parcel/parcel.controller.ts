@@ -1,9 +1,10 @@
 import { Request, Response } from "express";
 import { catchAsync } from "../../utils/catchAsync";
 import { sendResponse } from "../../utils/sendResponse";
-import { IUser } from "../user/user.interface";
 import { ParcelService } from './parcel.service';
 import AppError from "../../errorHelpers/appError";
+import { AuthUser } from "./parcel.interface";
+
 
 
 const createParcel = catchAsync(async (req: Request, res: Response) => {
@@ -14,7 +15,7 @@ const createParcel = catchAsync(async (req: Request, res: Response) => {
    }
 
 
-    const result = await ParcelService.createParcel(sender as IUser, req.body)
+    const result = await ParcelService.createParcel(sender as AuthUser, req.body)
 
     console.log("result from controller", result)
 
@@ -28,7 +29,7 @@ const createParcel = catchAsync(async (req: Request, res: Response) => {
 
 const claimParcel = catchAsync(async(req: Request, res: Response) => {
     const parcelId = req.params.id;
-    const receiver = req.user as IUser;
+    const receiver = req.user as AuthUser;
     const payload = req.body;
 
     // console.log("req body", req.body)
@@ -45,7 +46,7 @@ const claimParcel = catchAsync(async(req: Request, res: Response) => {
 })
 
 const updateTrackingReceiver = catchAsync(async(req: Request, res: Response) => {
-    const receiver = req.user as IUser;
+    const receiver = req.user as AuthUser;
     const payload = req.body;
 
     const result = await ParcelService.updateTrackingReceiver(receiver, payload);
@@ -60,7 +61,7 @@ const updateTrackingReceiver = catchAsync(async(req: Request, res: Response) => 
 })
 
 const updateTrackingSender = catchAsync(async(req: Request, res: Response) => {
-    const sender = req.user as IUser;
+    const sender = req.user as AuthUser;
     const payload = req.body;
 
     if(!payload.trackingId || !payload.currentStatus){
@@ -81,12 +82,8 @@ const updateTrackingSender = catchAsync(async(req: Request, res: Response) => {
 const giveRating = async (req: Request, res: Response) => {
   const { trackingId } = req.params;
   const { rating, feedback } = req.body; 
-  
-  if (!req.user) {
-    throw new AppError(401, "Unauthorized");
-    }
-  const user = req.user; // come's from auth middleware(token)
-    // console.log("usr",user, "req.body", req.body);
+
+  const user = req.user as AuthUser;
 
   const result  = await ParcelService.giveRating(trackingId, user, rating, feedback);
 
@@ -98,11 +95,54 @@ const giveRating = async (req: Request, res: Response) => {
   });
 };
 
+const getMyParcels = catchAsync(async (req: Request, res: Response) => {
+    const sender = req.user as AuthUser;
+    // console.log("user from controller", senderId)
+
+    const result = await ParcelService.getMyParcels(sender);
+
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "Parcels retrieved successfully",
+        data: result.parcels,
+        meta:{
+                totalParcels: result.totalCount,
+                totalDeliveries: result.deliveredCount,
+                totalUnclaimed: result.unclaimed,
+        }
+    });
+});
+
+
+const getIncomingParcels = catchAsync(async (req: Request, res: Response) => {
+    const receiver = req.user as AuthUser;
+    if(!receiver){
+        throw new AppError(401, "Unauthorized");
+    }
+
+    const result = await ParcelService.getIncomingParcels();    
+
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "Parcels retrieved successfully",
+        data: result.parcels,
+        meta:{
+            total: result.totalCount
+        }
+    })
+
+})
+
+
 
 export const ParcelController = {
     createParcel,
     claimParcel,
     updateTrackingReceiver,
     updateTrackingSender,
-    giveRating
+    giveRating, 
+    getMyParcels,
+    getIncomingParcels
 }
