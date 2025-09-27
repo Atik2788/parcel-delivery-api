@@ -78,9 +78,31 @@ const updateTrackingSender = catchAsync(async(req: Request, res: Response) => {
 
 })
 
+const giveRating = async (req: Request, res: Response) => {
+  const { trackingId } = req.params;
+  const { rating, feedback } = req.body; 
+  
+  if (!req.user) {
+    throw new AppError(401, "Unauthorized");
+    }
+  const user = req.user; // come's from auth middleware(token)
+    // console.log("usr",user, "req.body", req.body);
+
+  const result  = await ParcelService.giveRating(trackingId, user, rating, feedback);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Rating submitted successfully",
+    data: result.ratings
+  });
+};
+
+
 export const ParcelController = {
     createParcel,
     claimParcel,
     updateTrackingReceiver,
-    updateTrackingSender
+    updateTrackingSender,
+    giveRating
 }

@@ -10,11 +10,6 @@ const trackingEventSchema = new Schema({
   updatedAt: { type: Date, default: Date.now }
 });
 
-const ratingSchema = new Schema({
-  rating: Number,
-  comment: String,
-  ratedAt: Date
-});
 
 const addressSchema = new Schema({
   division: { type: String, required: true },
@@ -24,6 +19,23 @@ const addressSchema = new Schema({
   extra: { type: String }        // optional, e.g., road, landmark
 }, { _id: false });
 
+
+const ratingSchema = new Schema({
+  rating: {
+    type: Number,
+    min: 1,
+    max: 5,
+    required: false
+  },
+  feedback: {
+    type: String,
+    trim: true
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now
+  }
+});
 
 
 const parcelSchema = new Schema<IParcel>(
@@ -62,8 +74,8 @@ const parcelSchema = new Schema<IParcel>(
     trackingEvents: [trackingEventSchema],
 
     ratings: {
-      senderToReceiver: ratingSchema,
-      receiverToSender: ratingSchema
+      senderToReceiver: { type: ratingSchema },
+      receiverToSender: { type: ratingSchema }
     },
 
     isBlocked: { type: Boolean, default: false }

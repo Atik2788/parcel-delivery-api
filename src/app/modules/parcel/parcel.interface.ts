@@ -21,8 +21,8 @@ export interface ITrackingEvent {
 
 export interface IRating {
   rating: number;   // 1–5
-  comment?: string;
-  ratedAt: Date;
+  feedback?: string;
+  createdAt?: Date;
 }
 
 
