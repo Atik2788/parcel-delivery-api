@@ -9,6 +9,8 @@ router.patch("/claim/:id", checkAuth("RECEIVER"), ParcelController.claimParcel);
 router.patch("/update-tracking-receiver", checkAuth("RECEIVER"), ParcelController.updateTrackingReceiver);
 router.patch("/update-tracking-sender", checkAuth("SENDER"), ParcelController.updateTrackingSender);
 router.patch("/rating/:trackingId", checkAuth("SENDER", "RECEIVER"), ParcelController.giveRating);
+router.patch("/cancel/:parcelId", checkAuth("SENDER"), ParcelController.cancelParcel);
+
 
 router.get('/my-parcels', checkAuth("SENDER"), ParcelController.getMyParcels);
 router.get("/incoming", checkAuth("RECEIVER"), ParcelController.getIncomingParcels);

@@ -3,14 +3,14 @@
 import { NextFunction, Request, Response } from "express";
 import { catchAsync } from "../../utils/catchAsync";
 import { sendResponse } from "../../utils/sendResponse";
-import { UserService } from "./user.service";
+import { UpdateUserPayload, UserService } from "./user.service";
 import httpStatus  from 'http-status';
 import {JwtPayload } from "jsonwebtoken";
 
 
 const createUser = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     // Business logic for creating a user goes here
-    console.log("req.body from controller", req.body)
+    // console.log("req.body from controller", req.body)
     const user = await UserService.createUser(req.body);
 
     sendResponse(res, {
@@ -21,20 +21,16 @@ const createUser = catchAsync(async (req: Request, res: Response, next: NextFunc
     })
 })
 
-const getAllUsers = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    // Business logic for getting all users goes here
-    const users = await UserService.getAllUsers();
-    sendResponse(res, {
-        statusCode: 200,
-        success: true,
-        message: "Users fetched successfully",
-        data: users  
-    })
-})
+
 
 const updateUser = catchAsync(async(req: Request, res: Response, next: NextFunction) => {
     const userId = req.params.id;
-    const payload = req.body;
+    const payload: UpdateUserPayload = req.body;
+    console.log("payloed",payload)
+
+    if(payload.email){
+        throw new Error("Email cannot be updated");
+    }
 
     const verifiedToken = req.user;
 
@@ -54,7 +50,6 @@ const updateUser = catchAsync(async(req: Request, res: Response, next: NextFunct
 
 export const UserController = {
     createUser,
-    getAllUsers,
     updateUser
 }
 

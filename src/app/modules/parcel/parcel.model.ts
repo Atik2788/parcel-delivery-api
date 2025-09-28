@@ -80,7 +80,9 @@ const parcelSchema = new Schema<IParcel>(
 
     isBlocked: { type: Boolean, default: false }
   },
-  { timestamps: true }
+  { timestamps: true,
+    versionKey: false,    
+   }
 );
 
 

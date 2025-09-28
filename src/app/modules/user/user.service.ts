@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable prefer-const */
 import { User } from "./user.model";
 import { IAuthProvider, IUser, Role } from "./user.interface";
 import bcryptjs from 'bcryptjs';
@@ -8,15 +10,9 @@ import httpStatus from "http-status";
 
 
 const createUser = async(payload: Partial<IUser>) =>{
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const {email, password,role, ...rest} = payload;
-    console.log("role", role)
 
-    // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
-    const isUserExist = await User.findOne({email});
-
-    // if(isUserExist){
-    //     throw new Error("User already exist");
-    // }
 
     const hashPassword = await bcryptjs.hash(password as string, Number(envVars.BCRYPT_SALT_ROUNDS));
     const authProvider: IAuthProvider = {provider: "credential", providerId: email as string};
@@ -34,60 +30,121 @@ const createUser = async(payload: Partial<IUser>) =>{
     return {user};
 }
 
-
-const getAllUsers = async() => {
-    const users = await User.find();
-    const totalUsers = await User.countDocuments();
-
-    return {
-        users,
-        totalUsers
-    };
+export interface UpdateUserPayload extends Partial<IUser> {
+    oldPassword?: string;
 }
 
-const updateUser = async(userId: string, payload: Partial<IUser>, verifiedToken: JwtPayload) => {
-    console.log(verifiedToken)
+
+const updateUser = async (userId: string,payload: UpdateUserPayload, verifiedToken: JwtPayload) => {
     const ifUserExist = await User.findById(userId);
-
-    if(!ifUserExist){
-        throw new AppError(httpStatus.NOT_FOUND, "User does not exist")
-    }   
-
-    if(verifiedToken.role === Role.RECEIVER || verifiedToken.role === Role.SENDER){
-        if(verifiedToken.userId !== userId){
-            throw new AppError(httpStatus.FORBIDDEN, "You are not allowed to update other user profile")
-        }
+    if (!ifUserExist) {
+        throw new AppError(httpStatus.NOT_FOUND, "User does not exist");
     }
 
-    if(payload.role){
-        if(verifiedToken.role === Role.SENDER || verifiedToken.role === Role.RECEIVER){
-            throw new AppError(httpStatus.FORBIDDEN, "You are not allowed to update role")
-        }
+    const senderReceiverFields: (keyof IUser)[] = [
+        "name",
+        "email",
+        "password",
+        "phone",
+        "address",
+    ];
 
-        if(payload.role === Role.SUPER_ADMIN && verifiedToken.role === Role.ADMIN){
-            throw new AppError(httpStatus.FORBIDDEN, "You are not allowed to update role to Super_Admin")
-        }
-    }
- 
+    const adminFields: (keyof IUser)[] = [
+        "isActive",
+        "isDeleted",
+        "isValidated",
+        "role",
+    ];
 
-    if(payload.isActive || payload.isDeleted || payload.isValidated){
-            if(verifiedToken.role === Role.SENDER || verifiedToken.role === Role.RECEIVER){
-                throw new AppError(httpStatus.FORBIDDEN, "You are not allowed to update role")
+    // Generic helper to safely assign fields
+    const assignFields = <T extends keyof IUser>(
+        fields: T[],
+        target: Partial<IUser>,
+        source: Partial<IUser>
+    ) => {
+        fields.forEach((field) => {
+            if (field in source && source[field] !== undefined) {
+                target[field] = source[field] as IUser[T];
             }
+        });
+    };
+
+    const updateData: Partial<IUser> = {};
+
+    // Sender / Receiver
+    if (verifiedToken.role === Role.SENDER || verifiedToken.role === Role.RECEIVER) {
+        if (verifiedToken.userId !== userId) {
+            throw new AppError(
+                httpStatus.FORBIDDEN,
+                "You are not allowed to update other user profile"
+            );
+        }
+        assignFields(senderReceiverFields, updateData, payload);
+    }
+    
+    // Admin
+    else if (verifiedToken.role === Role.ADMIN) {
+        if (ifUserExist.role === Role.ADMIN || ifUserExist.role === Role.SUPER_ADMIN) {
+            throw new AppError(
+                httpStatus.FORBIDDEN,
+                `You cannot update another ${ifUserExist.role}`
+            );
+        }
+        assignFields([...senderReceiverFields, ...adminFields], updateData, payload);
     }
 
-    if(payload.password){
-        payload.password = await bcryptjs.hash(payload.password, envVars.BCRYPT_SALT_ROUNDS as string)
+    // Super Admin
+     else if (verifiedToken.role === Role.SUPER_ADMIN) {
+        if (ifUserExist.role === Role.SUPER_ADMIN) {
+            throw new AppError(
+                httpStatus.FORBIDDEN,
+                "You cannot update another Super Admin"
+            );
+        }
+        assignFields([...senderReceiverFields, ...adminFields], updateData, payload);
     }
 
-    const newUpdateUser = await User.findByIdAndUpdate(userId, payload, {new: true, runValidators: true})
 
-    return {newUpdateUser}
 
+    // Password handling
+    if (payload.password) {
+        if (!payload.oldPassword && verifiedToken.role !== Role.ADMIN && verifiedToken.role !== Role.SUPER_ADMIN) {
+            throw new AppError(
+                httpStatus.BAD_REQUEST,
+                "Old password is required to set a new password"
+            );
+        }
+    }
+
+        // Only check old password for self-update
+        if ((verifiedToken.role === Role.SENDER || verifiedToken.role === Role.RECEIVER) && payload.oldPassword) {
+            const isMatch = await bcryptjs.compare(payload.oldPassword, ifUserExist.password as string);
+
+            if (!isMatch) {
+                throw new AppError(
+                    httpStatus.UNAUTHORIZED,
+                    "Old password is incorrect"
+                );
+            }
+        }
+
+        const saltRounds: number = parseInt(envVars.BCRYPT_SALT_ROUNDS as string, 10);
+        
+        updateData.password = await bcryptjs.hash(payload.password as string, saltRounds);
+
+
+    const newUpdateUser = await User.findByIdAndUpdate(userId, updateData, {
+        new: true,
+        runValidators: true,
+    });
+
+    return { newUpdateUser };
 }
+
+
+
 
 export const UserService = {
     createUser,
-    getAllUsers,
     updateUser
 }
