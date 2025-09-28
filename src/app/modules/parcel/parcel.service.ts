@@ -280,7 +280,7 @@ const giveRating = async (trackingId: string, user : AuthUser, rating: number, f
     if(!parcel.receiver?.userId){
         throw new AppError(400, "Receiver information is missing for this parcel");
     }
-    if (parcel.receiver.userId !== user.userId) {
+    if (parcel.receiver.userId.toString() !== user.userId.toString()) {
       throw new AppError(403, "You are not authorized to rate this parcel");
     }
     if (!parcel.ratings) {
@@ -319,8 +319,9 @@ const getMyParcels = async(sender: AuthUser ) => {
 
 const getIncomingParcels = async() => {
     const filter = {"receiver.userId": {$exists: false}}
+
     const parcels = await Parcel.find(filter)
-                     .populate("sender.userId", "name email") // sender info useful হতে পারে
+                     .populate("sender.userId", "name email") // sender info useful for receiver 
                     .sort({ createdAt: -1 });
 
     const totalCount = await Parcel.countDocuments(filter);
@@ -331,6 +332,32 @@ const getIncomingParcels = async() => {
 
 }
 
+const cancelParcel = async(parcelId: string, sender: AuthUser) => {
+    console.log("parcel id", parcelId)
+    const parcel = await Parcel.findById(parcelId);
+
+    if(!parcel){
+        throw new AppError(404, "Parcel not found");
+    }
+
+    if(parcel.sender.userId.toString() !== sender.userId.toString()){
+        throw new AppError(403, "You are not authorized to cancel this parcel");    
+    }
+
+    if(parcel.currentStatus === ParcelStatus.CANCELLED){
+        throw new AppError(400, "Parcel already in CANCELLED status");
+    }
+
+    if([ParcelStatus.DISPATCHED, ParcelStatus.IN_TRANSIT, ParcelStatus.DELIVERED, ParcelStatus.RETURNED].includes(parcel.currentStatus)){
+        throw new AppError(400, `Cannot cancel a ${parcel.currentStatus} parcel`);
+    }
+
+    parcel.currentStatus = ParcelStatus.CANCELLED;
+    await parcel.save();
+
+    return parcel;
+}
+
 export const ParcelService = {
     createParcel,
     claimParcel,
@@ -338,6 +365,7 @@ export const ParcelService = {
     updateTrackingSender,
     giveRating,
     getMyParcels,
-    getIncomingParcels
+    getIncomingParcels,
+    cancelParcel
 }
 

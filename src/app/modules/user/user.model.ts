@@ -31,15 +31,6 @@ const userSchema = new Schema<IUser>({
     },
     isValidated: {type: Boolean, default: false},
     auths: [authProviderSchema],
-    
-
-
-    // Parcel system fields
-    parcelsSent: [{ type: Schema.Types.ObjectId, ref: "Parcel" }], // as Sender
-    deliveries: [{ type: Schema.Types.ObjectId, ref: "Parcel" }],  // as Receiver
-    averageRating: { type: Number, default: 0 },
-    totalRatings: { type: Number, default: 0 }
-
 
 }, {
     timestamps: true,
