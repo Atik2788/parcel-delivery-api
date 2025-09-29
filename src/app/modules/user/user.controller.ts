@@ -26,7 +26,7 @@ const createUser = catchAsync(async (req: Request, res: Response, next: NextFunc
 const updateUser = catchAsync(async(req: Request, res: Response, next: NextFunction) => {
     const userId = req.params.id;
     const payload: UpdateUserPayload = req.body;
-    console.log("payloed",payload)
+    // console.log("payloed",payload)
 
     if(payload.email){
         throw new Error("Email cannot be updated");

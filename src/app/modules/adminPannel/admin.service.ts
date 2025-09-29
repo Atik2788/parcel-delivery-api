@@ -9,18 +9,31 @@ export interface GetUsersQuery {
   limit?: number;
 }
 
+
 const getAllUsers = async(query: GetUsersQuery) => {
 
     if(!query || Object.keys(query).length === 0){
          const users = await User.find();
-        const totalUsers = await User.countDocuments();
+         const totalUsers = await User.countDocuments();
+
+        const totalSuperAdmins = await User.countDocuments({role: "SUPER_ADMIN"})
+        const totalAdmins = await User.countDocuments({role: "ADMIN"})
+        const totalSenders = await User.countDocuments({role: "SENDER"})
+        const totalReceivers = await User.countDocuments({role: "RECEIVER"})
 
         return {
         users,
-        totalUsers,
-        page: 1,
-        totalPages: 1,
-        };
+        meta:{
+            totalUsers,
+            totalSuperAdmins,
+            totalAdmins,
+            totalSenders,
+            totalReceivers,
+            
+            page: 1,
+            totalPages: 1,
+        }
+      }
     }
 
     const { search, page = 1, limit = 10 } = query;
@@ -41,12 +54,27 @@ const getAllUsers = async(query: GetUsersQuery) => {
     const users = await User.find(filter).skip(skip).limit(limit);
     const totalUsers = await User.countDocuments(filter);
 
+    const totalSuperAdmins = await User.countDocuments({role: "SUPER_ADMIN"})
+    const totalAdmins = await User.countDocuments({role: "ADMIN"})
+    const totalSenders = await User.countDocuments({role: "SENDER"})
+    const totalReceivers = await User.countDocuments({role: "RECEIVER"})
+
+    const pageNumber = Number(page) || 1;
+
 
     return {
         users,
-        totalUsers,
-        page,
-        totalPages: Math.ceil(totalUsers / limit),  
+        meta:{
+            totalUsers,
+            totalSuperAdmins,
+            totalAdmins,
+            totalSenders,
+            totalReceivers,
+
+            page: pageNumber,
+            totalPages: Math.ceil(totalUsers / limit),  
+        }
+
     };
 }
 
@@ -89,18 +117,70 @@ const updatePercelIsBlocked = async(parcelId: string, isBlocked: boolean) => {
     return parcel
 }
 
-const getAllPercels = async() =>{
-    const parcels = await Parcel.find();
+const getAllPercels = async(query: GetUsersQuery) =>{
+
+    if(!query || Object.keys(query).length === 0){
+        const parcels = await Parcel.find();
+
+        const totalParcels = await Parcel.countDocuments();
+        const deliveredlParcels = await Parcel.countDocuments({currentStatus: "DELIVERED"});
+        const unclaimedParcels = await Parcel.countDocuments({currentStatus: "REQUESTED"});
+        const processingParcels = await Parcel.countDocuments({currentStatus: {$in: (["DISPATCHED", "IN_TRANSIT"])} });
+        const cancelledParcels = await Parcel.countDocuments({currentStatus: "CANCELLED"});
+        const returnedParcels = await Parcel.countDocuments({currentStatus: "RETURNED"});
+        const approvedParcels = await Parcel.countDocuments({currentStatus: "APPROVED"});
+        const blockedParcels = await Parcel.countDocuments({isBlocked: true});
 
 
-    const totalParcels = await Parcel.countDocuments();
-    const deliveredlParcels = await Parcel.countDocuments({currentStatus: "DELIVERED"});
-    const unclaimedParcels = await Parcel.countDocuments({currentStatus: "REQUESTED"});
-    const processingParcels = await Parcel.countDocuments({currentStatus: {$in: (["DISPATCHED", "IN_TRANSIT"])} });
-    const cancelledParcels = await Parcel.countDocuments({currentStatus: "CANCELLED"});
-    const returnedParcels = await Parcel.countDocuments({currentStatus: "RETURNED"});
-    const approvedParcels = await Parcel.countDocuments({currentStatus: "APPROVED"});
-    const blockedParcels = await Parcel.countDocuments({isBlocked: true});
+        return {
+            parcels,
+            meta: {
+                totalParcels,
+                deliveredlParcels,
+                unclaimedParcels,
+                processingParcels,
+                cancelledParcels,
+                returnedParcels,
+                blockedParcels,
+                approvedParcels,
+
+                page: 1,
+                totalPage: 1,
+            }
+        }
+    }
+
+    const { search, page = 1, limit = 10 } = query;
+    const skip = (page -1) * limit
+
+    const filter = search ? {
+        $or: [
+            { trackingId: { $regex: search, $options: "i" } },
+            { type: { $regex: search, $options: "i" } },
+            { "sender.name": { $regex: search, $options: "i" } },
+            { "receiver.name": { $regex: search, $options: "i" } },
+            { currentStatus: { $regex: search, $options: "i" } }
+        ]
+    } : {};
+
+    const parcels = await Parcel.find(filter).skip(skip).limit(limit);
+
+    // Counts for meta
+    const totalParcels = await Parcel.countDocuments(filter);
+    const deliveredlParcels = await Parcel.countDocuments({ ...filter, currentStatus: "DELIVERED" });
+    const unclaimedParcels = await Parcel.countDocuments({ ...filter, currentStatus: "REQUESTED" });
+    const processingParcels = await Parcel.countDocuments({ ...filter, currentStatus: { $in: ["DISPATCHED", "IN_TRANSIT"] } });
+    const cancelledParcels = await Parcel.countDocuments({ ...filter, currentStatus: "CANCELLED" });
+    const returnedParcels = await Parcel.countDocuments({ ...filter, currentStatus: "RETURNED" });
+    const approvedParcels = await Parcel.countDocuments({ ...filter, currentStatus: "APPROVED" });
+    const blockedParcels = await Parcel.countDocuments({ ...filter, isBlocked: true });
+
+
+    const totalPages = Math.ceil(totalParcels / limit);
+    const pageNumber = Number(page) || 1;
+
+
+
 
 
 
@@ -114,9 +194,13 @@ const getAllPercels = async() =>{
             cancelledParcels,
             returnedParcels,
             blockedParcels,
-            approvedParcels
+            approvedParcels,
+
+            page: pageNumber, 
+            totalPages
         }
     }
+
 }
 
 

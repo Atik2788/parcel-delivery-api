@@ -114,7 +114,7 @@ const updateUser = async (userId: string,payload: UpdateUserPayload, verifiedTok
                 "Old password is required to set a new password"
             );
         }
-    }
+    
 
         // Only check old password for self-update
         if ((verifiedToken.role === Role.SENDER || verifiedToken.role === Role.RECEIVER) && payload.oldPassword) {
@@ -129,8 +129,9 @@ const updateUser = async (userId: string,payload: UpdateUserPayload, verifiedTok
         }
 
         const saltRounds: number = parseInt(envVars.BCRYPT_SALT_ROUNDS as string, 10);
-        
         updateData.password = await bcryptjs.hash(payload.password as string, saltRounds);
+    }
+        
 
 
     const newUpdateUser = await User.findByIdAndUpdate(userId, updateData, {
