@@ -95,24 +95,38 @@ const giveRating = async (req: Request, res: Response) => {
   });
 };
 
-const getMyParcels = catchAsync(async (req: Request, res: Response) => {
+const getMyParcelsSender = catchAsync(async (req: Request, res: Response) => {
     const sender = req.user as AuthUser;
     // console.log("user from controller", senderId)
 
-    const result = await ParcelService.getMyParcels(sender);
+    const result = await ParcelService.getMyParcelsSender(sender);
 
     sendResponse(res, {
         statusCode: 200,
         success: true,
         message: "Parcels retrieved successfully",
         data: result.parcels,
-        meta:{
-                totalParcels: result.totalCount,
-                totalDeliveries: result.deliveredCount,
-                totalUnclaimed: result.unclaimed,
-        }
+        meta: result.meta,
     });
 });
+
+const getMyParcelsReceiver = catchAsync(async (req: Request, res: Response) => {
+    const receiver = req.user as AuthUser;
+    // console.log(receiver)
+    if(!receiver){
+        throw new AppError(401, "Unauthorized");
+    }
+
+    const result = await ParcelService.getMyParcelsReceiver(receiver);    
+
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "Parcels retrieved successfully",
+        data: result.parcels,
+        meta: result.meta      
+    })
+})
 
 
 const getIncomingParcels = catchAsync(async (req: Request, res: Response) => {
@@ -158,7 +172,8 @@ export const ParcelController = {
     updateTrackingReceiver,
     updateTrackingSender,
     giveRating, 
-    getMyParcels,
+    getMyParcelsSender,
+    getMyParcelsReceiver,
     getIncomingParcels,
     cancelParcel
 }

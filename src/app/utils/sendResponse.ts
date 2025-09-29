@@ -4,18 +4,33 @@ interface TMeta {
     total: number;
 }
 
-interface TMetaParcel{
-    totalParcels: number,
-    totalDeliveries: number,
-    totalUnclaimed: number,
+interface TMetaParcelGetSender{
+           totalCount: number,
+            deliveredCount: number,
+            cancelledCount: number,
+            returnedCount: number,
+            approvedCount: number,
+            blockedCount: number,
+            unclaimed: number,
+            inTransit: number,
+            dispatched: number,
+}
+
+interface TMetaParcelGetReceiver{
+            totalParcel: number,
+            deliveredCount: number,
+            inTransit: number,
+            dispatched: number,
+            blocked: number,
+            returned: number,
 }
 
 interface TMetaAllUsers{
     totalUsers: number,
-    superAdmin: number,
-    admin:  number,
-    sender: number,
-    receiver: number,
+    totalSuperAdmins: number,
+    totalAdmins:  number,
+    totalSenders: number,
+    totalReceivers: number,
 }
 
 interface TMetaParcelUsers{
@@ -40,7 +55,7 @@ interface tResponse <T>{
     success: boolean; 
     message: string;
     data: T;
-    meta?: TMeta | TMetaParcel | TMetaAllUsers | TMetaParcelUsers | TMetaAllParcels;
+    meta?: TMeta | TMetaParcelGetSender | TMetaAllUsers | TMetaParcelUsers | TMetaAllParcels | TMetaParcelGetReceiver;
 }
 
 export const sendResponse = <T>(res: Response, data: tResponse<T>) => {

@@ -5,35 +5,34 @@ import { sendResponse } from "../../utils/sendResponse";
 import { catchAsync } from "../../utils/catchAsync";
 import { AdminService } from "./admin.service";
 import { GetUsersQuery } from './admin.service';
+import { is } from "zod/v4/locales";
 
 
 const getAllUsers = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    
     const query = req.query;
 
     const result = await AdminService.getAllUsers(query as GetUsersQuery);
-
+    // console.log(result)
+    
 
     sendResponse(res, {
         statusCode: 200,
         success: true,
         message: "Users fetched successfully",
-        data: result,
-        meta:{
-            totalUsers: result.totalUsers,
-            page: result.page as number,
-            totalPages: result.totalPages
-        }
-    })
+        data: result.users,
+        meta: result.meta,
+    });
+
 })
 
 
 const updatePercelIsBlocked = catchAsync(async (req: Request, res: Response) => {
     const parcelId = req.params.id;
     const { isBlocked } = req.body;
-    if(!isBlocked){
-        throw new Error("isBlocked is required");
-    }
+    
+if (isBlocked === undefined) {
+    throw new Error("isBlocked is required");
+}
 
     const updatedParcel = await AdminService.updatePercelIsBlocked(parcelId, isBlocked);
 
@@ -46,24 +45,15 @@ const updatePercelIsBlocked = catchAsync(async (req: Request, res: Response) => 
   })
 
   const getAllPercels = catchAsync(async(req: Request, res: Response) => {
-
-    const result = await AdminService.getAllPercels();
+    const query = req.query;
+    const result = await AdminService.getAllPercels(query);
 
     sendResponse(res, {
         statusCode: 200,
         success: true,
         message: "Parcels fetched successfully",
-        data: result,
-        meta: {
-            totalParcels : result.meta.totalParcels,
-            deliveredlParcels : result.meta.deliveredlParcels,
-            unclaimedParcels : result.meta.unclaimedParcels,
-            processingParcels : result.meta.processingParcels,
-            cancelledParcels : result.meta.cancelledParcels,
-            returnedParcels : result.meta.returnedParcels,
-            blockedParcels : result.meta.blockedParcels,
-            approvedParcels : result.meta.approvedParcels
-        }
+        data: result.parcels,
+        meta: result.meta
     })
   })
 
