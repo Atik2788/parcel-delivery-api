@@ -83,6 +83,7 @@ const updatePercelIsBlocked = async(parcelId: string, isBlocked: boolean) => {
     if(!parcel){
         throw new Error("Parcel not found");
     }
+    // console.log(isBlocked)
 
     if(isBlocked === true){        
         if (
@@ -93,11 +94,11 @@ const updatePercelIsBlocked = async(parcelId: string, isBlocked: boolean) => {
             parcel.isBlocked = isBlocked;
         }
         else{
-            throw new Error("This parcel cannot be blocked, because it is already completed.");
+            throw new Error(`This parcel cannot be blocked, because it is already ${parcel.currentStatus} `);
         }
     }
 
-    if(isBlocked === false){
+    else if(isBlocked === false){
         parcel.isBlocked = isBlocked;
 
         const lastEvents = parcel.trackingEvents?.[parcel.trackingEvents.length - 1];

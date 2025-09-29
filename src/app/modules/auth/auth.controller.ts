@@ -9,6 +9,7 @@ import { setAuthCookie } from "../../utils/setCookie"
 import { sendResponse } from "../../utils/sendResponse"
 import  httpStatus  from 'http-status';
 import passport from 'passport';
+import { AuthService } from "./auth.service"
 
 
 const credentialLogin = catchAsync(async(req: Request, res: Response, next: NextFunction)=>{
@@ -47,6 +48,32 @@ const credentialLogin = catchAsync(async(req: Request, res: Response, next: Next
         
 })
 
+
+
+const getNewAccessToken = catchAsync(async(req: Request, res: Response, next: NextFunction)=>{
+        const refreshToken = req.cookies.refreshToken;
+
+        if(!refreshToken){
+            throw new AppError(httpStatus.BAD_REQUEST, "Refresh token not found")
+        }
+
+        const tokenInfo = await AuthService.getNewAccessToken(refreshToken) 
+
+
+        setAuthCookie(res, tokenInfo)
+        
+        sendResponse(res, {
+            statusCode: httpStatus.OK,
+            success: true,
+            message: "New Access Token Retrieved Successfully",
+            data: tokenInfo
+        })
+})
+
+
+
+
 export const AuthController = {
-    credentialLogin
+    credentialLogin,
+    getNewAccessToken
 }

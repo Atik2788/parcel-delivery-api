@@ -5,6 +5,7 @@ import { sendResponse } from "../../utils/sendResponse";
 import { catchAsync } from "../../utils/catchAsync";
 import { AdminService } from "./admin.service";
 import { GetUsersQuery } from './admin.service';
+import { is } from "zod/v4/locales";
 
 
 const getAllUsers = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
@@ -28,9 +29,10 @@ const getAllUsers = catchAsync(async (req: Request, res: Response, next: NextFun
 const updatePercelIsBlocked = catchAsync(async (req: Request, res: Response) => {
     const parcelId = req.params.id;
     const { isBlocked } = req.body;
-    if(!isBlocked){
-        throw new Error("isBlocked is required");
-    }
+    
+if (isBlocked === undefined) {
+    throw new Error("isBlocked is required");
+}
 
     const updatedParcel = await AdminService.updatePercelIsBlocked(parcelId, isBlocked);
 
