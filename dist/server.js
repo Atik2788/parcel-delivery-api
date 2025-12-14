@@ -14,13 +14,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importDefault(require("mongoose"));
 const app_1 = __importDefault(require("./app"));
+const env_1 = require("./app/config/env");
+const seedSuperAdmin_1 = require("./app/utils/seedSuperAdmin");
+const PORT = Number(process.env.PORT) || Number(env_1.envVars.PORT) || 5000;
 let server;
 const startServer = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        yield mongoose_1.default.connect("mongodb+srv://atik2788:AAAAAaaaaa111@cluster0.6du7f.mongodb.net/parcel-delevery-db?retryWrites=true&w=majority&appName=Cluster0");
-        console.log("Database connected");
-        server = app_1.default.listen(5000, () => {
-            console.log("Server is running on port 5000");
+        yield mongoose_1.default.connect(env_1.envVars.DB_URL);
+        console.log("Database connected successfully");
+        // server = app.listen(envVars.PORT, () => {
+        //     console.log(`Server is running on port ${envVars.PORT} in ${envVars.NODE_ENV} mode`);
+        // })
+        server = app_1.default.listen(PORT, "0.0.0.0", () => {
+            console.log(`✅ Server is running on port ${PORT} in ${env_1.envVars.NODE_ENV} mode`);
         });
     }
     catch (error) {
@@ -29,7 +35,7 @@ const startServer = () => __awaiter(void 0, void 0, void 0, function* () {
 });
 (() => __awaiter(void 0, void 0, void 0, function* () {
     yield startServer();
-    // await seedSuperAdmin()
+    yield (0, seedSuperAdmin_1.seedSuperAdmin)();
 }))();
 process.on("SIGTERM", () => {
     console.log("SIGTERM signal received, shutting down server...");
