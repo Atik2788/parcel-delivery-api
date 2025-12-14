@@ -182,9 +182,6 @@ const getAllPercels = async(query: GetUsersQuery) =>{
 
 
 
-
-
-
     return {
         parcels,
         meta: {
