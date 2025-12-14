@@ -6,7 +6,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const routes_1 = require("./app/routes");
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
-const cors_1 = __importDefault(require("cors"));
 const globalErrorHandlars_1 = require("./app/middlewares/globalErrorHandlars");
 const notFound_1 = __importDefault(require("./app/middlewares/notFound"));
 const passport_1 = __importDefault(require("passport"));
@@ -14,17 +13,28 @@ const env_1 = require("./app/config/env");
 const express_session_1 = __importDefault(require("express-session"));
 require("./app/config/passport");
 const app = (0, express_1.default)();
+// app.use(expressSession({
+//   secret : envVars.EXPRESS_SESSION_SECRET,
+//   resave: false,
+//   saveUninitialized: false
+// }))
 app.use((0, express_session_1.default)({
     secret: env_1.envVars.EXPRESS_SESSION_SECRET,
     resave: false,
-    saveUninitialized: false
+    saveUninitialized: false,
+    cookie: {
+        httpOnly: true, // JS থেকে read করা যাবে না
+        secure: process.env.NODE_ENV === "production", // https only
+        sameSite: "lax", // frontend domain cross-site requests জন্য
+        maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+    }
 }));
 app.use(passport_1.default.initialize());
 app.use(passport_1.default.session());
-app.use((0, cors_1.default)({
-    origin: "http://localhost:3000",
-    credentials: true
-}));
+// app.use(cors({
+//         origin: "http://localhost:3000",
+//         credentials: true
+//     }));
 app.use((0, cookie_parser_1.default)());
 app.use(express_1.default.json());
 app.use("/api/v1", routes_1.router);
