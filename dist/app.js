@@ -31,12 +31,13 @@ app.use((0, express_session_1.default)({
     resave: false,
     saveUninitialized: false,
     cookie: {
-        httpOnly: true, // JS থেকে read করা যাবে না
-        secure: process.env.NODE_ENV === "production", // https only
-        sameSite: "lax", // frontend domain cross-site requests জন্য
-        maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+        httpOnly: true, // JS থেকে access যাবে না
+        secure: false, // dev mode
+        sameSite: "lax", // dev এ lax
+        maxAge: 7 * 24 * 60 * 60 * 1000
     }
 }));
+console.log("Refresh token cookie set!");
 app.use(passport_1.default.initialize());
 app.use(passport_1.default.session());
 app.use("/api/v1", routes_1.router);
