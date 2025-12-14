@@ -19,6 +19,16 @@ import "./app/config/passport";
     //   saveUninitialized: false
     // }))
 
+    app.use(cors({
+        origin: "http://localhost:3000",
+        credentials: true
+    }));
+
+
+
+        
+    app.use(cookieParser());
+
     app.use(expressSession({
     secret: envVars.EXPRESS_SESSION_SECRET,
     resave: false,
@@ -31,20 +41,15 @@ import "./app/config/passport";
     }
     }));
 
+
     app.use(passport.initialize());
     app.use(passport.session());
-    app.use(cors({
-            origin: "http://localhost:3000",
-            credentials: true
-        }));
-        
-    app.use(cookieParser());
-    app.use(express.json());
+
 
     app.use("/api/v1", router);
 
 
-
+    app.use(express.json());
 
 
 
