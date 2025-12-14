@@ -140,28 +140,28 @@ GOOGLE_CALLBACK_URL= https://parcel-delivery-api-a9en.onrender.com/api/v1/auth/g
 The API is organized into routes for authentication, user management, parcel operations, and admin tasks. All routes are prefixed with `/api/v1`.
 
 ### Authentication Routes
-- **POST https://parcel-delivery-api-a9en.onrender.com/api/v1/auth/login**: Log in with email and password.
-- **POST https://parcel-delivery-api-a9en.onrender.com/api/v1/auth/refresh-token**: Generate a new access token using a refresh token.
+- **POST https://parcel-delivery-api-a9en.onrender.com//api/v1/auth/login**: Log in with email and password.
+- **POST https://parcel-delivery-api-a9en.onrender.com//api/v1/auth/refresh-token**: Generate a new access token using a refresh token.
 
 ### User Routes
-- **POST https://parcel-delivery-api-a9en.onrender.com/api/v1/users/register**: Register a new user.
-- **PATCH https://parcel-delivery-api-a9en.onrender.com/api/v1/users/:id**: Update user profile (requires authentication).
+- **POST https://parcel-delivery-api-a9en.onrender.com//api/v1/users/register**: Register a new user.
+- **PATCH https://parcel-delivery-api-a9en.onrender.com//api/v1/users/:id**: Update user profile (requires authentication).
 
 ### Parcel Routes
-- **POST https://parcel-delivery-api-a9en.onrender.com/api/v1/parcels**: Create a new parcel (SENDER only).
-- **PATCH https://parcel-delivery-api-a9en.onrender.com/api/v1/parcels/claim/:id**: Claim a parcel (RECEIVER only).
-- **PATCH https://parcel-delivery-api-a9en.onrender.com/api/v1/parcels/update-tracking-sender**: Update parcel status (SENDER only).
-- **PATCH https://parcel-delivery-api-a9en.onrender.com/api/v1/parcels/update-tracking-receiver**: Update parcel status (RECEIVER only).
-- **PATCH https://parcel-delivery-api-a9en.onrender.com/api/v1/parcels/rating/:trackingId**: Rate a parcel (SENDER or RECEIVER).
-- **PATCH https://parcel-delivery-api-a9en.onrender.com/api/v1/parcels/cancel/:parcelId**: Cancel a parcel (SENDER only).
-- **GET https://parcel-delivery-api-a9en.onrender.com/api/v1/parcels/my-parcels-sender**: Get sender's parcels (SENDER only).
-- **GET https://parcel-delivery-api-a9en.onrender.com/api/v1/parcels/my-parcels-receiver**: Get receiver's parcels (RECEIVER only).
-- **GET https://parcel-delivery-api-a9en.onrender.com/api/v1/parcels/incoming-parcels**: Get unclaimed parcels (RECEIVER only).
+- **POST https://parcel-delivery-api-a9en.onrender.com//api/v1/parcels**: Create a new parcel (SENDER only).
+- **PATCH https://parcel-delivery-api-a9en.onrender.com//api/v1/parcels/claim/:id**: Claim a parcel (RECEIVER only).
+- **PATCH https://parcel-delivery-api-a9en.onrender.com//api/v1/parcels/update-tracking-sender**: Update parcel status (SENDER only).
+- **PATCH https://parcel-delivery-api-a9en.onrender.com//api/v1/parcels/update-tracking-receiver**: Update parcel status (RECEIVER only).
+- **PATCH https://parcel-delivery-api-a9en.onrender.com//api/v1/parcels/rating/:trackingId**: Rate a parcel (SENDER or RECEIVER).
+- **PATCH https://parcel-delivery-api-a9en.onrender.com//api/v1/parcels/cancel/:parcelId**: Cancel a parcel (SENDER only).
+- **GET https://parcel-delivery-api-a9en.onrender.com//api/v1/parcels/my-parcels-sender**: Get sender's parcels (SENDER only).
+- **GET https://parcel-delivery-api-a9en.onrender.com//api/v1/parcels/my-parcels-receiver**: Get receiver's parcels (RECEIVER only).
+- **GET https://parcel-delivery-api-a9en.onrender.com//api/v1/parcels/incoming-parcels**: Get unclaimed parcels (RECEIVER only).
 
 ### Admin Routes
-- **GET https://parcel-delivery-api-a9en.onrender.com/api/v1/adminRoute/all-users**: Fetch all users (ADMIN or SUPER_ADMIN).
-- **GET https://parcel-delivery-api-a9en.onrender.com/api/v1/adminRoute/all-parcels**: Fetch all parcels (ADMIN or SUPER_ADMIN).
-- **PATCH https://parcel-delivery-api-  a9en.onrender.com/api/v1/adminRoute/parcel-block/:id**: Block/unblock a parcel (ADMIN or SUPER_ADMIN).
+- **GET https://parcel-delivery-api-a9en.onrender.com//api/v1/adminRoute/all-users**: Fetch all users (ADMIN or SUPER_ADMIN).
+- **GET https://parcel-delivery-api-a9en.onrender.com//api/v1/adminRoute/all-parcels**: Fetch all parcels (ADMIN or SUPER_ADMIN).
+- **PATCH https://parcel-delivery-api-a9en.onrender.com//api/v1/adminRoute/parcel-block/:id**: Block/unblock a parcel (ADMIN or SUPER_ADMIN).
 
 ---
 
@@ -182,7 +182,7 @@ Authorization: Bearer <your-access-token>
 To obtain a token:
 1. **Log in**:
    ```http
-   POST https://parcel-delivery-api-a9en.onrender.com/api/v1/auth/login
+   POST https://parcel-delivery-api-a9en.onrender.com//api/v1/auth/login
    Content-Type: application/json
 
    {
@@ -205,7 +205,7 @@ To obtain a token:
 
 2. **Refresh Token** (if access token expires):
    ```http
-   POST https://parcel-delivery-api-a9en.onrender.com/api/v1/auth/refresh-token
+   POST https://parcel-delivery-api-a9en.onrender.com//api/v1/auth/refresh-token
    Content-Type: application/json
 
    {
@@ -225,7 +225,7 @@ To obtain a token:
 
 ### User API Testing
 #### 1. Register a User
-- **Endpoint**: `POST https://parcel-delivery-api-a9en.onrender.com/api/v1/users/register`
+- **Endpoint**: `POST https://parcel-delivery-api-a9en.onrender.com//api/v1/users/register`
 - **Body**:
   ```json
   {
@@ -254,7 +254,7 @@ To obtain a token:
   ```
 
 #### 2. Update User Profile
-- **Endpoint**: `PATCH https://parcel-delivery-api-a9en.onrender.com/api/v1/users/:id`
+- **Endpoint**: `PATCH https://parcel-delivery-api-a9en.onrender.com//api/v1/users/:id`
 - **Headers**:
   ```http
   Authorization: Bearer <jwt-access-token>
@@ -285,7 +285,7 @@ To obtain a token:
 
 ### Parcel API Testing
 #### 1. Create a Parcel
-- **Endpoint**: `POST https://parcel-delivery-api-a9en.onrender.com/api/v1/parcels`
+- **Endpoint**: `POST https://parcel-delivery-api-a9en.onrender.com//api/v1/parcels`
 - **Headers**:
   ```http
   Authorization: Bearer <jwt-access-token>
@@ -329,7 +329,7 @@ To obtain a token:
   ```
 
 #### 2. Claim a Parcel
-- **Endpoint**: `PATCH https://parcel-delivery-api-a9en.onrender.com/api/v1/parcels/claim/:id`
+- **Endpoint**: `PATCH https://parcel-delivery-api-a9en.onrender.com//api/v1/parcels/claim/:id`
 - **Headers**:
   ```http
   Authorization: Bearer <jwt-access-token>
@@ -355,7 +355,7 @@ To obtain a token:
   ```
 
 #### 3. Update Tracking (Receiver)
-- **Endpoint**: `PATCH https://parcel-delivery-api-a9en.onrender.com/api/v1/parcels/update-tracking-receiver`
+- **Endpoint**: `PATCH https://parcel-delivery-api-a9en.onrender.com//api/v1/parcels/update-tracking-receiver`
 - **Headers**:
   ```http
   Authorization: Bearer <jwt-access-token>
@@ -383,7 +383,7 @@ To obtain a token:
   ```
 
 #### 4. Update Tracking (Sender)
-- **Endpoint**: `PATCH https://parcel-delivery-api-a9en.onrender.com/api/v1/parcels/update-tracking-sender`
+- **Endpoint**: `PATCH https://parcel-delivery-api-a9en.onrender.com//api/v1/parcels/update-tracking-sender`
 - **Headers**:
   ```http
   Authorization: Bearer <jwt-access-token>
@@ -409,7 +409,7 @@ To obtain a token:
   ```
 
 #### 5. Rate a Parcel
-- **Endpoint**: `PATCH https://parcel-delivery-api-a9en.onrender.com/api/v1/parcels/rating/:trackingId`
+- **Endpoint**: `PATCH https://parcel-delivery-api-a9en.onrender.com//api/v1/parcels/rating/:trackingId`
 - **Headers**:
   ```http
   Authorization: Bearer <jwt-access-token>
@@ -437,7 +437,7 @@ To obtain a token:
   ```
 
 #### 6. Cancel a Parcel
-- **Endpoint**: `PATCH https://parcel-delivery-api-a9en.onrender.com/api/v1/parcels/cancel/:parcelId`
+- **Endpoint**: `PATCH https://parcel-delivery-api-a9en.onrender.com//api/v1/parcels/cancel/:parcelId`
 - **Headers**:
   ```http
   Authorization: Bearer <jwt-access-token>
@@ -456,7 +456,7 @@ To obtain a token:
   ```
 
 #### 7. Get Sender's Parcels
-- **Endpoint**: `GET https://parcel-delivery-api-a9en.onrender.com/api/v1/parcels/my-parcels-sender`
+- **Endpoint**: `GET https://parcel-delivery-api-a9en.onrender.com//api/v1/parcels/my-parcels-sender`
 - **Headers**:
   ```http
   Authorization: Bearer <jwt-access-token>
@@ -482,7 +482,7 @@ To obtain a token:
   ```
 
 #### 8. Get Receiver's Parcels
-- **Endpoint**: `GET https://parcel-delivery-api-a9en.onrender.com/api/v1/parcels/my-parcels-receiver`
+- **Endpoint**: `GET https://parcel-delivery-api-a9en.onrender.com//api/v1/parcels/my-parcels-receiver`
 - **Headers**:
   ```http
   Authorization: Bearer <jwt-access-token>
@@ -508,7 +508,7 @@ To obtain a token:
   ```
 
 #### 9. Get Incoming Parcels
-- **Endpoint**: `GET https://parcel-delivery-api-a9en.onrender.com/api/v1/parcels/incoming`
+- **Endpoint**: `GET https://parcel-delivery-api-a9en.onrender.com//api/v1/parcels/incoming`
 - **Headers**:
   ```http
   Authorization: Bearer <jwt-access-token>
@@ -533,7 +533,7 @@ To obtain a token:
 
 ### Admin API Testing
 #### 1. Get All Users
-- **Endpoint**: `GET https://parcel-delivery-api-a9en.onrender.com/api/v1/adminRoute/all-users?search=john&page=1&limit=10`
+- **Endpoint**: `GET https://parcel-delivery-api-a9en.onrender.com//api/v1/adminRoute/all-users?search=john&page=1&limit=10`
 - **Headers**:
   ```http
   Authorization: Bearer <jwt-access-token>
@@ -560,7 +560,7 @@ To obtain a token:
   ```
 
 #### 2. Get All Parcels
-- **Endpoint**: `GET https://parcel-delivery-api-a9en.onrender.com/api/v1/adminRoute/all-parcels?search=TRK&page=1&limit=10`
+- **Endpoint**: `GET https://parcel-delivery-api-a9en.onrender.com//api/v1/adminRoute/all-parcels?search=TRK&page=1&limit=10`
 - **Headers**:
   ```http
   Authorization: Bearer <jwt-access-token>
@@ -586,7 +586,7 @@ To obtain a token:
   ```
 
 #### 3. Block/Unblock a Parcel
-- **Endpoint**: `PATCH https://parcel-delivery-api-a9en.onrender.com/api/v1/adminRoute/parcel-block/:id`
+- **Endpoint**: `PATCH https://parcel-delivery-api-a9en.onrender.com//api/v1/adminRoute/parcel-block/:id`
 - **Headers**:
   ```http
   Authorization: Bearer <jwt-access-token>
