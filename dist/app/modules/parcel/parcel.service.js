@@ -240,14 +240,14 @@ const getMyParcelsSender = (sender) => __awaiter(void 0, void 0, void 0, functio
         .populate("sender.userId", "name email") // sender এর info confirm করার জন্য
         .sort({ createdAt: -1 });
     const totalCount = yield parcel_model_1.Parcel.countDocuments(filter);
-    const deliveredCount = yield parcel_model_1.Parcel.countDocuments({ "currentStatus": "DELIVERED" });
-    const cancelledCount = yield parcel_model_1.Parcel.countDocuments({ "currentStatus": "CANCELLED" });
-    const returnedCount = yield parcel_model_1.Parcel.countDocuments({ "currentStatus": "RETURNED" });
-    const approvedCount = yield parcel_model_1.Parcel.countDocuments({ "currentStatus": "APPROVED" });
-    const unclaimed = yield parcel_model_1.Parcel.countDocuments({ "currentStatus": "REQUESTED" });
-    const blockedCount = yield parcel_model_1.Parcel.countDocuments({ isBlocked: true });
-    const inTransit = yield parcel_model_1.Parcel.countDocuments({ "currentStatus": "IN_TRANSIT" });
-    const dispatched = yield parcel_model_1.Parcel.countDocuments({ "currentStatus": "DISPATCHED" });
+    const deliveredCount = yield parcel_model_1.Parcel.countDocuments({ "sender.userId": sender.userId, "currentStatus": "DELIVERED" });
+    const cancelledCount = yield parcel_model_1.Parcel.countDocuments({ "sender.userId": sender.userId, "currentStatus": "CANCELLED" });
+    const returnedCount = yield parcel_model_1.Parcel.countDocuments({ "sender.userId": sender.userId, "currentStatus": "RETURNED" });
+    const approvedCount = yield parcel_model_1.Parcel.countDocuments({ "sender.userId": sender.userId, "currentStatus": "APPROVED" });
+    const unclaimed = yield parcel_model_1.Parcel.countDocuments({ "sender.userId": sender.userId, "currentStatus": "REQUESTED" });
+    const blockedCount = yield parcel_model_1.Parcel.countDocuments({ "sender.userId": sender.userId, isBlocked: true });
+    const inTransit = yield parcel_model_1.Parcel.countDocuments({ "sender.userId": sender.userId, "currentStatus": "IN_TRANSIT" });
+    const dispatched = yield parcel_model_1.Parcel.countDocuments({ "sender.userId": sender.userId, "currentStatus": "DISPATCHED" });
     return {
         parcels,
         meta: {
