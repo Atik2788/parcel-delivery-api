@@ -309,14 +309,14 @@ const getMyParcelsSender = async(sender: AuthUser ) => {
       
     const totalCount = await Parcel.countDocuments(filter);
 
-    const deliveredCount = await Parcel.countDocuments({"currentStatus": "DELIVERED"});   
-    const cancelledCount = await Parcel.countDocuments({"currentStatus": "CANCELLED"});
-    const returnedCount = await Parcel.countDocuments({"currentStatus": "RETURNED"});
-    const approvedCount = await Parcel.countDocuments({"currentStatus": "APPROVED"});
-    const unclaimed = await Parcel.countDocuments({"currentStatus": "REQUESTED"});
-    const blockedCount = await Parcel.countDocuments({isBlocked: true}); 
-    const inTransit = await Parcel.countDocuments({"currentStatus": "IN_TRANSIT" });
-    const dispatched = await Parcel.countDocuments({"currentStatus":  "DISPATCHED"});
+    const deliveredCount = await Parcel.countDocuments({"sender.userId": sender.userId, "currentStatus": "DELIVERED"});   
+    const cancelledCount = await Parcel.countDocuments({"sender.userId": sender.userId, "currentStatus": "CANCELLED"});
+    const returnedCount = await Parcel.countDocuments({"sender.userId": sender.userId, "currentStatus": "RETURNED"});
+    const approvedCount = await Parcel.countDocuments({"sender.userId": sender.userId, "currentStatus": "APPROVED"});
+    const unclaimed = await Parcel.countDocuments({"sender.userId": sender.userId, "currentStatus": "REQUESTED"});
+    const blockedCount = await Parcel.countDocuments({"sender.userId": sender.userId, isBlocked: true}); 
+    const inTransit = await Parcel.countDocuments({"sender.userId": sender.userId, "currentStatus": "IN_TRANSIT" });
+    const dispatched = await Parcel.countDocuments({"sender.userId": sender.userId, "currentStatus":  "DISPATCHED"});
 
       return {
         parcels,
