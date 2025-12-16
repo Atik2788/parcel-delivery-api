@@ -127,7 +127,7 @@ const getIncomingParcels = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(
 }));
 const cancelParcel = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const parcelId = req.params.parcelId;
-    console.log(parcelId);
+    // console.log(parcelId)
     const sender = req.user;
     const result = yield parcel_service_1.ParcelService.cancelParcel(parcelId, sender);
     (0, sendResponse_1.sendResponse)(res, {

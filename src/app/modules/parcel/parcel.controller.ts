@@ -6,7 +6,6 @@ import AppError from "../../errorHelpers/appError";
 import { AuthUser } from "./parcel.interface";
 
 
-
 const createParcel = catchAsync(async (req: Request, res: Response) => {
    const sender = req.user;
     // console.log(sender)
@@ -152,7 +151,7 @@ const getIncomingParcels = catchAsync(async (req: Request, res: Response) => {
 
 const cancelParcel= catchAsync(async(req: Request, res: Response) => {
     const parcelId = req.params.parcelId;
-    console.log(parcelId)
+    // console.log(parcelId)
     const sender = req.user as AuthUser;    
 
     const result = await ParcelService.cancelParcel(parcelId, sender);    

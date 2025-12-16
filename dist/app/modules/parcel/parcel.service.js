@@ -285,7 +285,10 @@ const getMyParcelsReceiver = (receiver) => __awaiter(void 0, void 0, void 0, fun
     };
 });
 const getIncomingParcels = () => __awaiter(void 0, void 0, void 0, function* () {
-    const filter = { "receiver.userId": { $exists: false } };
+    const filter = {
+        "receiver.userId": { $exists: false },
+        currentStatus: { $in: ["REQUESTED", "APPROVED"] }
+    };
     const parcels = yield parcel_model_1.Parcel.find(filter)
         .populate("sender.userId", "name email") // sender info useful for receiver 
         .sort({ createdAt: -1 });
@@ -295,7 +298,7 @@ const getIncomingParcels = () => __awaiter(void 0, void 0, void 0, function* () 
     };
 });
 const cancelParcel = (parcelId, sender) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("parcel id", parcelId);
+    // console.log("parcel id", parcelId)
     const parcel = yield parcel_model_1.Parcel.findById(parcelId);
     if (!parcel) {
         throw new appError_1.default(404, "Parcel not found");

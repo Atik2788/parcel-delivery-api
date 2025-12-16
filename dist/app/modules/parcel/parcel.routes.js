@@ -13,5 +13,5 @@ router.patch("/rating/:trackingId", (0, checkAuth_1.checkAuth)("SENDER", "RECEIV
 router.patch("/cancel/:parcelId", (0, checkAuth_1.checkAuth)("SENDER"), parcel_controller_1.ParcelController.cancelParcel);
 router.get('/my-parcels-sender', (0, checkAuth_1.checkAuth)("SENDER"), parcel_controller_1.ParcelController.getMyParcelsSender);
 router.get("/my-parcels-receiver", (0, checkAuth_1.checkAuth)("RECEIVER"), parcel_controller_1.ParcelController.getMyParcelsReceiver);
-router.get("/incoming-parcels", (0, checkAuth_1.checkAuth)("RECEIVER"), parcel_controller_1.ParcelController.getIncomingParcels); // UPDATE if any parcel has cancelled it not showing in incoming parcel. 
+router.get("/incoming-parcels", (0, checkAuth_1.checkAuth)("RECEIVER"), parcel_controller_1.ParcelController.getIncomingParcels);
 exports.ParcelRoutes = router;
