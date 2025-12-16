@@ -361,7 +361,10 @@ const getMyParcelsReceiver = async(receiver: AuthUser) => {
 }
 
 const getIncomingParcels = async() => {
-    const filter = {"receiver.userId": {$exists: false}}
+    const filter = {
+    "receiver.userId": { $exists: false },
+    currentStatus: { $in: ["REQUESTED", "APPROVED"] }
+    };
 
     const parcels = await Parcel.find(filter)
                      .populate("sender.userId", "name email") // sender info useful for receiver 
@@ -376,7 +379,7 @@ const getIncomingParcels = async() => {
 }
 
 const cancelParcel = async(parcelId: string, sender: AuthUser) => {
-    console.log("parcel id", parcelId)
+    // console.log("parcel id", parcelId)
     const parcel = await Parcel.findById(parcelId);
 
     if(!parcel){
