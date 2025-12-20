@@ -21,20 +21,11 @@ const app = (0, express_1.default)();
 // }))
 const allowedOrigins = [
     "http://localhost:3000",
-    process.env.FRONTEND_URL,
+    "https://parcel-delivery-service-frontend.netlify.app",
 ];
 app.use((0, cors_1.default)({
-    origin: (origin, callback) => {
-        if (!origin)
-            return callback(null, true); // Postman / server-to-server
-        if (allowedOrigins.includes(origin)) {
-            return callback(null, true);
-        }
-        return callback(new Error("CORS not allowed"));
-    },
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    origin: allowedOrigins,
+    credentials: true
 }));
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
