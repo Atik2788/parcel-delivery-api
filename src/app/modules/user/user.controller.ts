@@ -43,9 +43,6 @@ const updateUser = catchAsync(async(req: Request, res: Response, next: NextFunct
         message: "User updated successfully",
         data: user
     })
-
-
-
 })
 
 export const UserController = {
