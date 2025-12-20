@@ -19,9 +19,22 @@ const app = (0, express_1.default)();
 //   resave: false,
 //   saveUninitialized: false
 // }))
+const allowedOrigins = [
+    "http://localhost:3000",
+    process.env.FRONTEND_URL,
+];
 app.use((0, cors_1.default)({
-    origin: "http://localhost:3000",
-    credentials: true
+    origin: (origin, callback) => {
+        if (!origin)
+            return callback(null, true); // Postman / server-to-server
+        if (allowedOrigins.includes(origin)) {
+            return callback(null, true);
+        }
+        return callback(new Error("CORS not allowed"));
+    },
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
 }));
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
